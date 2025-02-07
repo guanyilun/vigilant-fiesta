@@ -3,7 +3,8 @@ from dataclasses import dataclass
 import datetime as dt
 
 from .. import source as src, utils as u
-from .sat import SATPolicy, State, CalTarget, SchedMode
+from .sat import SATPolicy, State, SchedMode
+from .tel import make_blocks, CalTarget
 
 logger = u.init_logger(__name__)
 
@@ -104,61 +105,6 @@ def make_cal_target(
         az_accel=az_accel,
     )
 
-def make_blocks(master_file):
-    return {
-        'baseline': {
-            'cmb': {
-                'type': 'toast',
-                'file': master_file
-            }
-        },
-        'calibration': {
-            'saturn': {
-                'type' : 'source',
-                'name' : 'saturn',
-            },
-            'jupiter': {
-                'type' : 'source',
-                'name' : 'jupiter',
-            },
-            'moon': {
-                'type' : 'source',
-                'name' : 'moon',
-            },
-            'uranus': {
-                'type' : 'source',
-                'name' : 'uranus',
-            },
-            'neptune': {
-                'type' : 'source',
-                'name' : 'neptune',
-            },
-            'mercury': {
-                'type' : 'source',
-                'name' : 'mercury',
-            },
-            'venus': {
-                'type' : 'source',
-                'name' : 'venus',
-            },
-            'mars': {
-                'type' : 'source',
-                'name' : 'mars',
-            },
-            'rcw38': {
-                'type' : 'source',
-                'name' : 'rcw38',
-            },
-            'taua': {
-                'type' : 'source',
-                'name' : 'taua',
-            },
-            'galcenter': {
-                'type' : 'source',
-                'name' : 'galcenter',
-            },
-        },
-    }
 
 commands_uxm_relock = [
     "############# Daily Relock",
@@ -234,9 +180,9 @@ def make_config(
     az_accel,
     iv_cadence,
     bias_step_cadence,
-    min_hwp_el,
     max_cmb_scan_duration,
     cal_targets,
+    min_hwp_el=None,
     az_stow=None,
     el_stow=None,
     boresight_override=None,
@@ -328,9 +274,8 @@ class SATP3Policy(SATPolicy):
     @classmethod
     def from_defaults(cls, master_file, az_speed=0.5, az_accel=0.25,
         iv_cadence=4*u.hour, bias_step_cadence=0.5*u.hour,
-        min_hwp_el=48, max_cmb_scan_duration=1*u.hour,
-        cal_targets=None, az_stow=None, el_stow=None,
-        boresight_override=None, hwp_override=None,
+        max_cmb_scan_duration=1*u.hour, cal_targets=None, min_hwp_el=48,
+        az_stow=None, el_stow=None, boresight_override=None, hwp_override=None,
         az_motion_override=False,
         state_file=None, **op_cfg
     ):
@@ -339,10 +284,10 @@ class SATP3Policy(SATPolicy):
 
         x = cls(**make_config(
             master_file, az_speed, az_accel,
-            iv_cadence, bias_step_cadence, min_hwp_el,
-            max_cmb_scan_duration, cal_targets,
-            az_stow, el_stow, boresight_override,
-            hwp_override, az_motion_override, **op_cfg)
+            iv_cadence, bias_step_cadence,
+            max_cmb_scan_duration, cal_targets, min_hwp_el,
+            az_stow, el_stow, boresight_override, hwp_override,
+            az_motion_override, **op_cfg)
         )
         x.state_file = state_file
         return x

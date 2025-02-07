@@ -287,7 +287,7 @@ def array_info_from_query(geometries, query):
     arrays = [make_circular_cover(*g['center'], g['radius']) for g in matched]
     return array_info_merge(arrays)
 
-def parse_sequence_from_toast(ifile):
+def parse_sequence_from_toast(ifile, columns):
     """
     Parameters
     ----------
