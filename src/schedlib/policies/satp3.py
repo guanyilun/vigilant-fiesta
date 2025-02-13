@@ -108,10 +108,7 @@ def make_cal_target(
 
 
 commands_uxm_relock = [
-    "############# Daily Relock",
-    "run.smurf.zero_biases()",
-    "",
-    "time.sleep(120)",
+    "############# Daily Relock",  
     "run.smurf.take_noise(concurrent=True, tag='res_check')",
     "run.smurf.uxm_relock(concurrent=True)",
     "run.smurf.take_bgmap(concurrent=True)",
@@ -124,6 +121,7 @@ commands_det_setup = [
     "################### Detector Setup######################",
     "with disable_trace():",
     "    run.initialize()",
+    "pysmurfs = run.CLIENTS['smurf']",
     "run.smurf.take_bgmap(concurrent=True)",
     "run.smurf.iv_curve(concurrent=True)",
     "for smurf in pysmurfs:",
